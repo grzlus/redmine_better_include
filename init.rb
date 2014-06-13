@@ -10,7 +10,9 @@ Redmine::Plugin.register :redmine_better_include do
     Redmine::WikiFormatting::Macros.register do
       desc "Ovverrides default include macro"
       macro :include do |obj, args|
-        page_name, chapter = args.first.to_s.split("#")
+        sth, chapter = args.first.to_s.split("#")
+        page_name, project_name = sth.split(":").reverse
+        @project = Project.where( identifier: project_name ).first! if project_name.present?
         page = Wiki.find_page(page_name, :project => @project)
         raise 'Page not found' if page.nil? || !User.current.allowed_to?(:view_wiki_pages, page.wiki.project)
         @included_wiki_pages ||= []
